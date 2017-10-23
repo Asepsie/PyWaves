@@ -384,7 +384,7 @@ class Address(object):
             })
             return pywaves.wrapper('/assets/broadcast/transfer', data)
 
-    def sendAsset(self, recipient, asset, amount, attachment='', txFee=pywaves.DEFAULT_TX_FEE):
+    def sendAsset(self, recipient, asset, amount, feeAssetId, attachment='', txFee=pywaves.DEFAULT_TX_FEE):
         if not self.privateKey:
             logging.error('Private key required')
         elif not asset.status():
@@ -401,7 +401,8 @@ class Address(object):
                     base58.b58decode(self.publicKey) + \
                     b'\1' + \
                     base58.b58decode(asset.assetId) + \
-                    b'\0' + \
+                    b'\1' + \
+                    base58.b58decode(feeAssetId) + \
                     struct.pack(">Q", timestamp) + \
                     struct.pack(">Q", amount) + \
                     struct.pack(">Q", txFee) + \
@@ -415,6 +416,7 @@ class Address(object):
                 "recipient": recipient.address,
                 "amount": amount,
                 "fee": txFee,
+                "feeAssetId": feeAssetId,
                 "timestamp": timestamp,
                 "attachment": base58.b58encode(crypto.str2bytes(attachment)),
                 "signature": signature
